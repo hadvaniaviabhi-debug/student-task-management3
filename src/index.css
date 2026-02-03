@@ -1,8 +1,8 @@
-.error-msg{
-color: red;
-font-size: 0.8rem;
-margin-top: 5px;
-margin-bottom: 10px;
-display: block;
-text-align: left;
+.error-msg {
+  color: red;
+  font-size: 0.8rem;
+  margin-top: 5px;
+  margin-bottom: 10px;
+  display: block;
+  text-align: left;
 }

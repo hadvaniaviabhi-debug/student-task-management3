@@ -1,15 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React, {useState } from "react";
 import "./Register.css";
 import { Link, useNavigate } from "react-router-dom";
 const Register = () => {
-// state to hold form data
+// state to hold form data//
 const [formData, setFormData] = useState({
 name: "",
 email: "",
 password: "",
 phone: "",
 });
-// logic section
+// logic section//
 const [errors, setErrors] = useState({});
 const navigate = useNavigate();
 
