@@ -1,142 +1,151 @@
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 
-const TaskForm = ({ addTask }) => {
-const [formData, setFormData] = useState({
-title: "",
-description: "",
-dueDate: "",
-priority: "Low",
-});
+export default function TaskForm({ addTask, editingTask, updateTask }) {
+  const [formData, setFormData] = useState({
+    title: "",
+    desc: "",
+    date: "",
+    priority: "",
+  });
 
-const [errors, setErrors] = useState({});
+  const [error, setError] = useState({});
 
-const handleInputChange = (e) => {
-setFormData({
-// Changed: Fixed typo
-...formData,
-[e.target.name]: e.target.value,
-});
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+    setError({
+      ...error,
+      [e.target.name]: "",
+    });
+  };
 
-setErrors({
-  ...errors,
-  [e.target.name]: "",
-});
-};
+  const validate = () => {
+    const newError = {};
 
-const validate = () => {
-const newErrors = {};
+    // Title validation (required + max 6 chars)
+    if (!formData.title.trim()) {
+      newError.title = "Task title is required";
+    } else if (formData.title.trim().length > 6) {
+      newError.title = "Title must be maximum 6 characters";
+    }
 
-if (!formData.title.trim()) {
-  newErrors.title = "Task title is required";
-}
+    if (!formData.date.trim()) {
+      newError.date = "Due date is required";
+    }
 
-if (!formData.dueDate) {
-  newErrors.dueDate = "Due date is required";
-}
+    if (!formData.desc.trim()) {
+      newError.desc = "Description is required";
+    } else if (formData.desc.trim().length > 12) {
+      newError.desc = "Description must be at least 12 characters";
+    }
 
-if (!formData.description.trim()) {
-  newErrors.description = "Description is required";
-}
+    setError(newError);
+    return Object.keys(newError).length === 0;
+  };
 
-setErrors(newErrors);
-return Object.keys(newErrors).length === 0;
-};
+  useEffect(() => {
+    setFormData(editingTask);
+  }, [editingTask]);
 
-const handleSubmit = (e) => {
-e.preventDefault();
+  const handleAdd = (e) => {
+    console.log(e);
+    e.preventDefault();
+    if (validate()) {
+      if (editingTask) {
+        updateTask(formData);
+      } else {
+        addTask(formData);
+      }
+    }
+  };
+  return (
+    <>
+      <div className="add-task-card">
+        <h2 style={{ marginBottom: "15px" }}>Add New Task</h2>
+        <form>
+          <div>
+            <input
+              type="text"
+              placeholder="Task Title"
+              name="title"
+              id="title"
+              value={formData?.title}
+              onChange={handleChange}
+            ></input>
+            {error.title && <span className="error-msg">{error.title}</span>}
+          </div>
 
-if (validate()) {
-  addTask(formData); // Changed: Call addTask prop function instead of TaskForm
-  alert("Task added successfully!");
+          <div>
+            <textarea
+              placeholder="Description"
+              rows="3"
+              name="desc"
+              id="desc"
+              value={formData?.desc}
+              onChange={handleChange}
+            ></textarea>
+            {error.desc && <span className="error-msg">{error.desc}</span>}
+          </div>
 
-  // Optional: Clear form after successful submission
-  handleClear();
-}
-};
+          <div style={{ display: "flex", gap: "10px" }}>
+            <div style={{ flex: 1 }}>
+              <input
+                type="date"
+                name="date"
+                id="date"
+                value={formData?.date}
+                onChange={handleChange}
+              />
+              {error.date && <span className="error-msg">{error.date}</span>}
+            </div>
 
-const handleClear = () => {
-setFormData({
-// Changed: Fixed typo
-title: "",
-description: "",
-dueDate: "",
-priority: "Low",
-});
-setErrors({});
-};
+            <div style={{ flex: 1 }}>
+              <select
+                name="priority"
+                id="priority"
+                value={formData?.priority}
+                onChange={handleChange}
+              >
+                <option value="Low">Low Priority</option>
+                <option value="Medium">Medium Priority</option>
+                <option value="High">High Priority</option>
+              </select>
+            </div>
+          </div>
 
-return (
-<>
-<div className="add-task-card">
-<h2 style={{ marginBottom: "15px" }}>Add New Task</h2>
-<form onSubmit={handleSubmit}>
-<div>
-<input
-type="text"
-name="title"
-value={formData.title}
-placeholder="Task Title"
-onChange={handleInputChange}
-/>
-{errors.title && <span className="error-msg">{errors.title}</span>}
-</div>
-<div>
-<textarea
-name="description" // Changed: Removed unnecessary type="text"
-value={formData.description}
-placeholder="Description"
-rows="3"
-onChange={handleInputChange}
-/>
-{errors.description && (
-<span className="error-msg">{errors.description}</span>
-)}
-</div>
-<div style={{ display: "flex", gap: "10px" }}>
-<div style={{ flex: 1 }}>
-<input
-type="date"
-name="dueDate"
-value={formData.dueDate}
-onChange={handleInputChange}
-/>
-{errors.dueDate && (
-<span className="error-msg">{errors.dueDate}</span>
-)}
-</div>
-<div style={{ flex: 1 }}>
-<select
-name="priority"
-value={formData.priority}
-onChange={handleInputChange}
->
-<option value="Low">Low priority</option>
-<option value="Medium">Medium priority</option>
-<option value="High">High priority</option>
-</select>
-</div>
-</div>
-<div
-className="form-actions"
-style={{ display: "flex", gap: "10px", marginTop: "10px" }}
->
-<button type="submit" className="btn-primary" style={{ flex: 1 }}>
-Add Task
-</button>
+          <div
+            className="form-action"
+            style={{ display: "flex", gap: "10px", marginTop: "10px" }}
+          >
+            <button
+              type="button"
+              className="btn-primary"
+              style={{ flex: 1 }}
+              onClick={handleAdd}
+            >
+              {editingTask ? "update" : "Add"}Task
+            </button>
 
-        <button
-          type="button"
-          className="btn-secondary"
-          style={{ flex: 1 }}
-          onClick={handleClear}
-        >
-          Clear
-        </button>
+            <button
+              type="button"
+              className="btn-secondary"
+              style={{ flex: 1 }}
+              onClick={() =>
+                setFormData({
+                  title: "",
+                  desc: "",
+                  date: "",
+                  priority: "Low",
+                })
+              }
+            >
+              Clear
+            </button>
+          </div>
+        </form>
       </div>
-    </form>
-  </div>
-</>
-);
-};
-
-export default TaskForm;
+    </>
+  );
+}
